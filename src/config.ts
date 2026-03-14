@@ -9,6 +9,9 @@ import { readEnvFile } from './env.js';
 const envConfig = readEnvFile([
   'ASSISTANT_NAME',
   'ASSISTANT_HAS_OWN_NUMBER',
+  'SLACK_BOT_TOKEN',
+  'SLACK_APP_TOKEN',
+  'SLACK_ONLY',
 ]);
 
 export const ASSISTANT_NAME =
@@ -67,3 +70,11 @@ export const TRIGGER_PATTERN = new RegExp(
 // Uses system timezone by default
 export const TIMEZONE =
   process.env.TZ || Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+// Slack configuration
+export const SLACK_BOT_TOKEN =
+  process.env.SLACK_BOT_TOKEN || envConfig.SLACK_BOT_TOKEN || '';
+export const SLACK_APP_TOKEN =
+  process.env.SLACK_APP_TOKEN || envConfig.SLACK_APP_TOKEN || '';
+export const SLACK_ONLY =
+  (process.env.SLACK_ONLY || envConfig.SLACK_ONLY) === 'true';

@@ -6,11 +6,15 @@ import {
   IDLE_TIMEOUT,
   MAIN_GROUP_FOLDER,
   POLL_INTERVAL,
+  SLACK_APP_TOKEN,
+  SLACK_BOT_TOKEN,
+  SLACK_ONLY,
   TRIGGER_PATTERN,
 } from './config.js';
+import { SlackChannel } from './channels/slack.js';
 import { WhatsAppChannel } from './channels/whatsapp.js';
 import {
-  ContainerOutput,
+  type ContainerOutput,
   runContainerAgent,
   writeGroupsSnapshot,
   writeTasksSnapshot,
@@ -445,9 +449,17 @@ async function main(): Promise<void> {
   };
 
   // Create and connect channels
-  whatsapp = new WhatsAppChannel(channelOpts);
-  channels.push(whatsapp);
-  await whatsapp.connect();
+  if (SLACK_BOT_TOKEN && SLACK_APP_TOKEN) {
+    const slack = new SlackChannel(SLACK_BOT_TOKEN, SLACK_APP_TOKEN, channelOpts);
+    channels.push(slack);
+    await slack.connect();
+  }
+
+  if (!SLACK_ONLY) {
+    whatsapp = new WhatsAppChannel(channelOpts);
+    channels.push(whatsapp);
+    await whatsapp.connect();
+  }
 
   // Start subsystems (independently of connection handler)
   startSchedulerLoop({
